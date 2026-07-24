@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usman Ansari | Interactive Creative Studio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        :root {
+            --accent: #7000ff;
+            --accent-glow: #00f0ff;
+            --bg-dark: #030308;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: #fff;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            cursor: auto; /* Restored normal mouse cursor */
+        }
+
+        /* --- STYLISH HEADER --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(3,3,8,0.8) 0%, rgba(3,3,8,0) 100%);
+            backdrop-filter: blur(8px);
+        }
+
+        header h1 {
+            color: #ffffff;
+            font-size: calc(1.2rem + 0.8vw);
+            font-weight: 200;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+
+        header h1 span {
+            font-weight: 900;
+            font-style: normal;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 30%, var(--accent-glow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- MAGNETIC BUTTON --- */
+        .cta-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 36px;
+            background: rgba(255, 255, 255, 0.03);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            overflow: hidden;
+            transition: border-color 0.4s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.25) 0%, rgba(112, 0, 255, 0) 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .cta-btn:hover::before {
+            opacity: 1;
+        }
+
+        .cta-btn:hover {
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.4), inset 0 0 15px rgba(112, 0, 255, 0.3);
+            color: #fff;
+        }
+
+        .bottom-cta-container {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* --- IMMERSIVE BACKDROP TEXT STATEMENT --- */
+        .statement-bg {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            font-size: calc(3rem + 5vw);
+            line-height: 0.9;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
+            text-transform: uppercase;
+            pointer-events: none;
+            padding: 0 5%;
+            letter-spacing: -2px;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* --- SECTIONS --- */
+        section {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        /* --- CLEAN NUMBERS OVERLAY (Boxes removed) --- */
+        .ui-content {
+            position: relative;
+            z-index: 3;
+            color: #ffffff;
+            pointer-events: none;
+            background: none;
+            padding: 0;
+            border-radius: 0;
+            border: none;
+            backdrop-filter: none;
+            box-shadow: none;
+        }
+
+        .ui-content h2 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1;
+            background: linear-gradient(135deg, #fff, #a5a5a5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .scroll-down {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.4);
+            font-size: 0.7rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            animation: float 2.5s infinite ease-in-out;
+            z-index: 3;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, 0); opacity: 0.3; }
+            50% { transform: translate(-50%, -10px); opacity: 0.8; }
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 20px; flex-direction: column; gap: 15px; text-align: center; }
+            section { padding: 0 5%; justify-content: center; text-align: center; }
+            .ui-content h2 { font-size: 2.5rem; }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1><span>Usman Ansari's</span> Project</h1>
+        <a href="mailto:usmanumersaeed@gmail.com" class="cta-btn js-animated-btn">Get Your Websites Developed By Us</a>
+    </header>
+
+    <!-- SECTION 1 -->
+    <section id="sec1">
+        <div class="statement-bg">There are billions of developers, but few true artists</div>
+        <div class="canvas-container" id="c1"></div>
+        <div class="ui-content">
+            <h2>01</h2>
+        </div>
+        <div class="scroll-down">Scroll down</div>
+    </section>
+
+    <!-- SECTION 2 -->
+    <section id="sec2">
+        <div class="statement-bg">There are billions of developers, but few true artists</div>
+        <div class="canvas-container" id="c2"></div>
+        <div class="ui-content">
+            <h2>02</h2>
+        </div>
+        <div class="scroll-down">Scroll down</div>
+    </section>
+
+    <!-- SECTION 3 -->
+    <section id="sec3">
+        <div class="statement-bg">There are billions of developers, but few true artists</div>
+        <div class="canvas-container" id="c3"></div>
+        <div class="ui-content">
+            <h2>03</h2>
+        </div>
+        <div class="scroll-down">Scroll down</div>
+    </section>
+
+    <!-- SECTION 4 -->
+    <section id="sec4">
+        <div class="statement-bg">There are billions of developers, but few true artists</div>
+        <div class="canvas-container" id="c4"></div>
+        <div class="ui-content">
+            <h2>04</h2>
+        </div>
+        <div class="scroll-down">Scroll down</div>
+    </section>
+
+    <!-- SECTION 5 -->
+    <section id="sec5">
+        <div class="statement-bg">There are billions of developers, but few true artists</div>
+        <div class="canvas-container" id="c5"></div>
+        <div class="ui-content">
+            <h2>05</h2>
+        </div>
+        <div class="scroll-down">Scroll down</div>
+    </section>
+
+    <!-- SECTION 6 -->
+    <section id="sec6">
+        <div class="statement-bg">There are billions of developers, but few true artists</div>
+        <div class="canvas-container" id="c6"></div>
+        <div class="ui-content">
+            <h2>06</h2>
+        </div>
+        <div class="scroll-down">Scroll down</div>
+    </section>
+
+    <!-- SECTION 7 -->
+    <section id="sec7">
+        <div class="statement-bg">There are billions of developers, but few true artists</div>
+        <div class="canvas-container" id="c7"></div>
+        <div class="ui-content">
+            <h2>07</h2>
+        </div>
+        <div class="scroll-down">Scroll down</div>
+    </section>
+
+    <!-- SECTION 8 -->
+    <section id="sec8">
+        <div class="statement-bg">There are billions of developers, but few true artists</div>
+        <div class="canvas-container" id="c8"></div>
+        <div class="ui-content">
+            <h2>08</h2>
+        </div>
+        <div class="bottom-cta-container">
+            <a href="mailto:usmanumersaeed@gmail.com" class="cta-btn js-animated-btn">Get Your Websites Developed By Us</a>
+        </div>
+    </section>
+
+    <script>
+        // --- MOUSE TRACKING SYSTEM ---
+        const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        function updateMouse() {
+            mouse.x += (mouse.targetX - mouse.x) * 0.05;
+            mouse.y += (mouse.targetY - mouse.y) * 0.05;
+            requestAnimationFrame(updateMouse);
+        }
+        updateMouse();
+
+        // --- MAGNETIC BUTTON EFFECT ---
+        const buttons = document.querySelectorAll('.js-animated-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - (rect.width / 2);
+                const y = e.clientY - rect.top - (rect.height / 2);
+                btn.style.transform = `translate(${x * 0.4}px, ${y * 0.4}px) scale(1.08)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0px, 0px) scale(1)';
+            });
+        });
+
+        // --- THREE.JS BOILERPLATE SETUP ---
+        function createSceneConfig(containerId) {
+            const container = document.getElementById(containerId);
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+            return { container, scene, camera, renderer };
+        }
+
+        // --- 01 / DYNAMIC FLUID CORE ---
+        (function() {
+            const cfg = createSceneConfig('c1');
+            cfg.camera.position.z = 3.5;
+
+            const geo = new THREE.IcosahedronGeometry(1.5, 32);
+            const mat = new THREE.MeshPhongMaterial({
+                color: 0x4a00e0,
+                emissive: 0x110033,
+                wireframe: true,
+                shininess: 100
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            cfg.scene.add(mesh);
+
+            const light = new THREE.PointLight(0x00f0ff, 2, 10);
+            light.position.set(2, 2, 2);
+            cfg.scene.add(light);
+            cfg.scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+
+            const pos = geo.attributes.position;
+            const origPos = pos.clone();
+            const clock = new THREE.Clock();
+
+            function loop() {
+                requestAnimationFrame(loop);
+                const t = clock.getElapsedTime();
+
+                for (let i = 0; i < pos.count; i++) {
+                    const u = origPos.getX(i);
+                    const v = origPos.getY(i);
+                    const w = origPos.getZ(i);
+                    
+                    const distortion = Math.sin(u * 3 + t * 2 + mouse.x * 4) * Math.cos(v * 3 + t * 2 + mouse.y * 4) * 0.25;
+                    pos.setXYZ(i, u + u * distortion, v + v * distortion, w + w * distortion);
+                }
+                pos.needsUpdate = true;
+
+                mesh.rotation.y = t * 0.2;
+                mesh.rotation.x = mouse.y * 0.5;
+                light.position.x = mouse.x * 3;
+                light.position.y = mouse.y * 3;
+
+                cfg.renderer.render(cfg.scene, cfg.camera);
+            }
+            loop();
+        })();
+
+        // --- 02 / HYPER GYROSCOPE ---
+        (function() {
+            const cfg = createSceneConfig('c2');
+            cfg.camera.position.z = 6;
+
+            const group = new THREE.Group();
+            cfg.scene.add(group);
+
+            const colors = [0x00f0ff, 0x7000ff, 0xff007f];
+            for (let i = 0; i < 3; i++) {
+                const geo = new THREE.TorusGeometry(1.8 + i * 0.5, 0.02, 16, 100);
+                const mat = new THREE.MeshBasicMaterial({ color: colors[i] });
+                const ring = new THREE.Mesh(geo, mat);
+                group.add(ring);
+            }
+
+            function loop() {
+                requestAnimationFrame(loop);
+                group.children[0].rotation.x += 0.01;
+                group.children[1].rotation.y += 0.015;
+                group.children[2].rotation.z += 0.008;
+
+                group.rotation.x = mouse.y * 1.2;
+                group.rotation.y = mouse.x * 1.2;
+
+                cfg.renderer.render(cfg.scene, cfg.camera);
+            }
+            loop();
+        })();
+
+        // --- 03 / KINETIC MATRIX ---
+        (function() {
+            const cfg = createSceneConfig('c3');
+            cfg.camera.position.z = 8;
+
+            const group = new THREE.Group();
+            cfg.scene.add(group);
+
+            const cubes = [];
+            const geo = new THREE.BoxGeometry(0.6, 0.6, 0.6);
+
+            for (let x = -2; x <= 2; x++) {
+                for (let y = -2; y <= 2; y++) {
+                    const mat = new THREE.MeshNormalMaterial({ wireframe: true });
+                    const cube = new THREE.Mesh(geo, mat);
+                    cube.position.set(x * 1.2, y * 1.2, 0);
+                    cube.userData = { origX: x * 1.2, origY: y * 1.2 };
+                    group.add(cube);
+                    cubes.push(cube);
+                }
+            }
+
+            const clock = new THREE.Clock();
+            function loop() {
+                requestAnimationFrame(loop);
+                const t = clock.getElapsedTime();
+
+                cubes.forEach((c, idx) => {
+                    const dist = Math.hypot(mouse.x * 5 - c.userData.origX, mouse.y * 5 - c.userData.origY);
+                    const factor = Math.max(0, 1 - dist / 4);
+
+                    c.position.z = factor * 2;
+                    c.rotation.x = t + idx + factor * 2;
+                    c.rotation.y = t * 0.5;
+                });
+
+                cfg.renderer.render(cfg.scene, cfg.camera);
+            }
+            loop();
+        })();
+
+        // --- 04 / RADIANT WAVES ---
+        (function() {
+            const cfg = createSceneConfig('c4');
+            cfg.camera.position.set(0, 5, 8);
+            cfg.camera.lookAt(0, 0, 0);
+
+            const count = 50;
+            const geo = new THREE.PlaneGeometry(12, 12, count, count);
+            const mat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.4 });
+            const plane = new THREE.Mesh(geo, mat);
+            plane.rotation.x = -Math.PI / 2.5;
+            cfg.scene.add(plane);
+
+            const pos = geo.attributes.position;
+            const clock = new THREE.Clock();
+
+            function loop() {
+                requestAnimationFrame(loop);
+                const t = clock.getElapsedTime() * 3;
+
+                for (let i = 0; i < pos.count; i++) {
+                    const x = pos.getX(i);
+                    const y = pos.getY(i);
+                    const dist = Math.hypot(x - mouse.x * 5, y - mouse.y * 5);
+                    const z = Math.sin(dist - t) * Math.exp(-dist * 0.3) * 1.5;
+                    pos.setZ(i, z);
+                }
+                pos.needsUpdate = true;
+
+                cfg.renderer.render(cfg.scene, cfg.camera);
+            }
+            loop();
+        })();
+
+        // --- 05 / SPATIAL WARP ---
+        (function() {
+            const cfg = createSceneConfig('c5');
+            cfg.camera.position.z = 5;
+
+            const count = 1000;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+
+            for (let i = 0; i < count * 3; i += 3) {
+                pos[i] = (Math.random() - 0.5) * 20;
+                pos[i+1] = (Math.random() - 0.5) * 20;
+                pos[i+2] = (Math.random() - 0.5) * 20;
+            }
+
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0x7000ff, size: 0.05 });
+            const particles = new THREE.Points(geo, mat);
+            cfg.scene.add(particles);
+
+            function loop() {
+                requestAnimationFrame(loop);
+                const p = geo.attributes.position.array;
+
+                for (let i = 2; i < count * 3; i += 3) {
+                    p[i] += 0.1 + (mouse.y + 1) * 0.1;
+                    if (p[i] > 10) p[i] = -10;
+                }
+                geo.attributes.position.needsUpdate = true;
+                particles.rotation.z = mouse.x * 0.5;
+
+                cfg.renderer.render(cfg.scene, cfg.camera);
+            }
+            loop();
+        })();
+
+        // --- 06 / NEURAL NETWORK ---
+        (function() {
+            const cfg = createSceneConfig('c6');
+            cfg.camera.position.z = 6;
+
+            const count = 80;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            const vel = [];
+
+            for (let i = 0; i < count; i++) {
+                pos[i * 3] = (Math.random() - 0.5) * 8;
+                pos[i * 3 + 1] = (Math.random() - 0.5) * 8;
+                pos[i * 3 + 2] = (Math.random() - 0.5) * 8;
+                vel.push(new THREE.Vector3((Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02));
+            }
+
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const pMat = new THREE.PointsMaterial({ color: 0x00f0ff, size: 0.1 });
+            const points = new THREE.Points(geo, pMat);
+            cfg.scene.add(points);
+
+            function loop() {
+                requestAnimationFrame(loop);
+                const p = geo.attributes.position.array;
+
+                for (let i = 0; i < count; i++) {
+                    p[i * 3] += vel[i].x;
+                    p[i * 3 + 1] += vel[i].y;
+                    p[i * 3 + 2] += vel[i].z;
+
+                    if (Math.abs(p[i * 3]) > 4) vel[i].x *= -1;
+                    if (Math.abs(p[i * 3 + 1]) > 4) vel[i].y *= -1;
+                    if (Math.abs(p[i * 3 + 2]) > 4) vel[i].z *= -1;
+                }
+                geo.attributes.position.needsUpdate = true;
+                cfg.scene.rotation.y = mouse.x;
+
+                cfg.renderer.render(cfg.scene, cfg.camera);
+            }
+            loop();
+        })();
+
+        // --- 07 / FROSTED PRISM ---
+        (function() {
+            const cfg = createSceneConfig('c7');
+            cfg.camera.position.z = 5;
+
+            const geo = new THREE.ConeGeometry(1.5, 2.5, 4);
+            const mat = new THREE.MeshNormalMaterial({ wireframe: true });
+            const prism = new THREE.Mesh(geo, mat);
+            cfg.scene.add(prism);
+
+            function loop() {
+                requestAnimationFrame(loop);
+                prism.rotation.x += 0.01;
+                prism.rotation.y += 0.01;
+                prism.position.x = mouse.x * 2;
+                prism.position.y = mouse.y * 2;
+
+                cfg.renderer.render(cfg.scene, cfg.camera);
+            }
+            loop();
+        })();
+
+        // --- 08 / COSMIC STREAMS ---
+        (function() {
+            const cfg = createSceneConfig('c8');
+            cfg.camera.position.z = 5;
+
+            const count = 600;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+
+            for (let i = 0; i < count * 3; i += 3) {
+                pos[i] = (Math.random() - 0.5) * 15;
+                pos[i+1] = (Math.random() - 0.5) * 15;
+                pos[i+2] = (Math.random() - 0.5) * 15;
+            }
+
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xff00ff, size: 0.06 });
+            const stream = new THREE.Points(geo, mat);
+            cfg.scene.add(stream);
+
+            function loop() {
+                requestAnimationFrame(loop);
+                stream.rotation.y += 0.005 + mouse.x * 0.02;
+                stream.rotation.x += mouse.y * 0.01;
+
+                cfg.renderer.render(cfg.scene, cfg.camera);
+            }
+            loop();
+        })();
+    </script>
+</body>
+</html>
