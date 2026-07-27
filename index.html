@@ -63,6 +63,13 @@
             -webkit-text-fill-color: transparent;
         }
 
+        /* Container added inside header to neatly align multiple buttons */
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
         /* --- MAGNETIC BUTTON --- */
         .cta-btn {
             position: relative;
@@ -204,6 +211,7 @@
 
         @media (max-width: 768px) {
             header { padding: 20px; flex-direction: column; gap: 15px; text-align: center; }
+            .header-actions { flex-direction: column; width: 100%; gap: 10px; }
             section { padding: 0 5%; justify-content: center; text-align: center; }
             .ui-content h2 { font-size: 2.5rem; }
         }
@@ -214,7 +222,11 @@
 
     <header>
         <h1><span>Usman Ansari's</span> Project</h1>
-        <a href="mailto:usmanumersaeed@gmail.com" class="cta-btn js-animated-btn">Get Your Websites Developed By Us</a>
+        <div class="header-actions">
+            <!-- New Stylish Text Button Linked to aaa.html -->
+            <a href="aaa.html" class="cta-btn js-animated-btn">View Projects</a>
+            <a href="mailto:usmanumersaeed@gmail.com" class="cta-btn js-animated-btn">Get Your Websites Developed By Us</a>
+        </div>
     </header>
 
     <!-- SECTION 1 -->
