@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Usman The Web Guru — Generative Art Collection</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+  }
+  canvas {
+    display: block;
+  }
+  #hint {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.45);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 0.5s ease;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+</head>
+<body>
+<div id="hint">Click to Switch Art (1 / 9)</div>
+
+<script>
+let mode = 0;
+const TOTAL_MODES = 9;
+
+// Global animation timing / tracking variables
+let t1 = 0, pts1 = [], W1;
+let t2 = 0;
+let z3 = 0;
+let f4 = 0;
+let t5 = 1, primes5 = [];
+let t6 = 0;
+let t7 = 0, pts7 = [];
+let t8 = 0;
+let t9 = 0;
+
+// Interactive Text Particles State
+let textParticles = [];
+const signatureText = "Usman The Web Guru";
+
+function setup() {
+  createCanvas(windowWidth, windowHeight, WEBGL);
+  colorMode(HSB, 360, 100, 100, 100);
+  W1 = min(width, height);
+  background(0);
+  frameRate(60);
+
+  initPrimes();
+  createTextParticles();
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  W1 = min(width, height);
+  background(0);
+  pts1 = [];
+  t1 = 0;
+  createTextParticles();
+}
+
+function updateHint() {
+  let hint = document.getElementById('hint');
+  hint.innerText = `Click to Switch Art (${mode + 1} / ${TOTAL_MODES})`;
+  hint.style.opacity = '1';
+  clearTimeout(window._hintTimeout);
+  window._hintTimeout = setTimeout(() => {
+    hint.style.opacity = '0.35';
+  }, 2000);
+}
+
+// Pre-calculate primes for Code 5
+function initPrimes() {
+  let n = 20000;
+  let p = new Array(n).fill(0);
+  for (let i = 2; i < n; i++) {
+    if (p[i] === 0) {
+      primes5.push(i);
+      for (let j = i * 2; j < n; j += i) {
+        p[j] = 1;
+      }
+    }
+  }
+}
+
+// Create particle grid out of the signature text for mouse interaction
+function createTextParticles() {
+  textParticles = [];
+  let pG = createGraphics(width, height);
+  pG.pixelDensity(1);
+  pG.background(0);
+  pG.fill(255);
+  pG.textAlign(CENTER, CENTER);
+  
+  // Calculate large, bold, responsive font size
+  let fontSize = max(28, min(width, height) * 0.065);
+  pG.textSize(fontSize);
+  pG.textStyle(BOLD);
+  pG.textFont('system-ui, -apple-system, sans-serif');
+  pG.text(signatureText, width / 2, height / 2);
+
+  pG.loadPixels();
+  let step = floor(max(3, fontSize / 12)); // Adaptive resolution density
+
+  for (let y = 0; y < height; y += step) {
+    for (let x = 0; x < width; x += step) {
+      let index = (x + y * width) * 4;
+      if (pG.pixels[index] > 128) {
+        // Position relative to center for WEBGL compatibility
+        let targetX = x - width / 2;
+        let targetY = y - height / 2;
+        textParticles.push({
+          x: targetX,
+          y: targetY,
+          baseX: targetX,
+          baseY: targetY,
+          vx: 0,
+          vy: 0
+        });
+      }
+    }
+  }
+  pG.remove();
+}
+
+function draw() {
+  // Dispatch active art routine
+  switch (mode) {
+    case 0: drawFlowField(); break;
+    case 1: drawMandala1(); break;
+    case 2: drawConeMesh(); break;
+    case 3: drawOrbitingSphere(); break;
+    case 4: drawPrimeSpiral(); break;
+    case 5: drawMandala2(); break;
+    case 6: drawBlurStream(); break;
+    case 7: drawMandala3(); break;
+    case 8: drawDeformedGrid(); break;
+  }
+
+  drawInteractiveSignature();
+}
+
+// =====================================================
+// CODE 1: Noise-driven Flow Stream (FASTER)
+// =====================================================
+function drawFlowField() {
+  resetMatrix();
+  noStroke();
+  fill(0, t1 ? 15 : 100);
+  rect(-width/2, -height/2, width, height);
+
+  for (let i = 0; i < 80; i++) { // Increased spawn rate
+    let idx = t1 % (W1 * 4);
+    pts1[idx] = { x: (t1 * 99) % width - width/2, y: -height/2, g: 0, s: 4 };
+    t1 += 2;
+  }
+
+  for (let p of pts1) {
+    if (!p) continue;
+    p.s *= 0.992;
+    let n = noise((p.x + width/2) / W1, (p.y + height/2) / 9, t1 / W1);
+    let bright = 55 + n * 45;
+    stroke(0, 0, bright, 90);
+    strokeWeight(max(p.s, 0.3));
+    p.x += n > 0.4 ? 0 : (n % 0.1 > 0.05 ? 6 : -6); // Faster horizontal drift
+    if (n > 0.4) {
+      p.g += 3.0; // Higher gravity speed
+      p.y += p.g;
+    } else {
+      p.g = 0;
+      p.y += 5.5; // Faster downward speed
+    }
+    point(p.x, p.y);
+    if (p.y > height / 2 + 20) p.y = -height / 2 - 10;
+  }
+}
+
+// =====================================================
+// CODE 2: Parametric Mandala Flower (FASTER)
+// =====================================================
+function mandalaPoint(y, i, tt) {
+  let k = (y < 11 ? 6 + sin(y ^ 8) * 6 : y / 5 + cos(y / 2)) * cos(i - tt / 4);
+  let e = y / 7 - 13;
+  let d = mag(k, e) + sin(e / 4 + tt) / 2;
+  let q = (y * k / d) * (3 + sin(d * 2 + y / 2 - tt * 4));
+  let c = d / 2 + 1 - tt / 2;
+  let x = q + 60 * cos(c) + 200;
+  let yy = q * sin(c) + d * 29 - 170;
+  return { x, y: yy, d };
+}
+
+function drawMandala1() {
+  resetMatrix();
+  noStroke();
+  fill(0, 20);
+  rect(-width/2, -height/2, width, height);
+
+  t2 += PI / 15; // 3x faster rotation step
+  let ref = 200;
+  let scale = min(width, height) / 340;
+
+  for (let i = 4000; i--;) {
+    let y = i / 138;
+    let p = mandalaPoint(y, i, t2);
+    let bright = 55 + (p.d * 3) % 45;
+    stroke(0, 0, bright, 80);
+    strokeWeight(1.4);
+    let px = (p.x - ref) * scale;
+    let py = (p.y - ref) * scale;
+    point(px, py);
+  }
+}
+
+// =====================================================
+// CODE 3: WebGL Cone Wave (FASTER)
+// =====================================================
+function C_curve(x, X, W, a) {
+  stroke(180, 80, 100, 50);
+  strokeWeight(1);
+  noFill();
+  beginShape();
+  curveVertex(x, -width/2);
+  curveVertex(0, a);
+  curveVertex(X, 0);
+  curveVertex(a - 2 * x, X);
+  curveVertex(W, x);
+  endShape();
+}
+
+function drawConeMesh() {
+  resetMatrix();
+  background(0);
+  let W = 200;
+  let X = -80;
+  let x = X;
+
+  rotateX(0.5);
+  for (let i = -width; i < width; i += W) {
+    push();
+    x = -x;
+    translate(x, 90, i + (z3 % width));
+    stroke(0, 0, 100, 40);
+    strokeWeight(1);
+    cone(30, -W, 5, 5);
+    line(30, X, -30, X);
+    C_curve(x, X, W, 20);
+    C_curve(x, X, W, -20);
+    pop();
+  }
+  z3 += 7; // Faster motion speed
+}
+
+// =====================================================
+// CODE 4: Orbiting Sphere & Light Torus Ring (FASTER)
+// =====================================================
+function drawOrbitingSphere() {
+  resetMatrix();
+  background(0);
+  
+  f4 += 0.035; // ~3.5x faster orbit speed
+  let scaleF = min(width, height) / 400;
+
+  push();
+  let zVal = 170 * scaleF;
+  translate(60 * sin(f4) * scaleF, -20 * scaleF, zVal);
+
+  let lx = 99 * sin(-f4) * scaleF;
+  let lz = 99 * cos(f4) * scaleF;
+
+  pointLight(0, 0, 100, lx, 0, lz);
+
+  push();
+  translate(lx, 0, lz);
+  noStroke();
+  fill(0, 0, 100);
+  sphere(6 * scaleF);
+  pop();
+
+  for (let i = 0; i < TWO_PI; i += PI / 32) {
+    push();
+    rotateY(i + f4);
+    translate(120 * scaleF, 0);
+    rotateX(0.8);
+    stroke(0, 0, 80, 30);
+    strokeWeight(1);
+    noFill();
+    torus(60 * scaleF, 2 * scaleF);
+    pop();
+  }
+  pop();
+}
+
+// =====================================================
+// CODE 5: Prime Spiral Simulation (FASTER)
+// =====================================================
+function drawPrimeSpiral() {
+  resetMatrix();
+  background(0);
+  stroke(0, 0, 100, 80);
+  strokeWeight(2);
+
+  let scaleF = min(width, height) / 600;
+
+  for (let i = 0; i < primes5.length; i++) {
+    let p = primes5[i];
+    let r = (p * scaleF) / 35;
+    let angle = p * t5;
+    let x = r * sin(angle);
+    let y = r * cos(angle);
+
+    if (abs(x) < width / 2 && abs(y) < height / 2) {
+      point(x, y);
+    }
+  }
+  t5 += 0.00003; // Faster spiral transformation
+}
+
+// =====================================================
+// CODE 6: Polar Parametric Burst (FASTER)
+// =====================================================
+function drawMandala2() {
+  resetMatrix();
+  noStroke();
+  fill(0, 20);
+  rect(-width/2, -height/2, width, height);
+
+  t6 += PI / 7; // Faster rotation
+  let scaleF = min(width, height) / 400;
+
+  stroke(0, 0, 100, 50);
+  strokeWeight(1.2);
+
+  for (let i = 1e4; i--;) {
+    let x = i % 200;
+    let y = i / 43;
+    let k = 5 * cos(x / 14) * cos(y / 30);
+    let e = y / 8 - 13;
+    let d = (k * k + e * e) / 59 + 4;
+    let q = (60 - 3 * sin(atan2(k, e) * e) + k * (3 + (4 / d) * sin(d * d - t6 * 2)));
+    let c = d / 2 + e / 99 - t6 / 18;
+
+    let px = (q * sin(c)) * scaleF;
+    let py = (q + d * 9 - 100) * cos(c) * scaleF;
+
+    point(px, py);
+  }
+}
+
+// =====================================================
+// CODE 7: Blur Particle Stream (FASTER)
+// =====================================================
+function drawBlurStream() {
+  resetMatrix();
+  noStroke();
+  fill(0, 25);
+  rect(-width/2, -height/2, width, height);
+
+  for (let i = 40; i--;) {
+    let idx = t7++ % 2000;
+    pts7[idx] = { x: (t7 % width) - width/2, y: -height/2, s: 2, t: 3 };
+  }
+
+  for (let p of pts7) {
+    if (!p) continue;
+    p.t *= 0.99;
+    strokeWeight(max(p.t, 0.5));
+    stroke(0, 0, 100, 70);
+
+    p.x += (noise((p.x + width/2) / 99, (p.y + height/2) / 99, t7 / width) - 0.5) * p.s * 2.5;
+    p.s *= noise((p.x + width/2) / 99, t7 / width) + 0.6;
+    p.y += p.s * 3.5; // Faster downward drop
+
+    point(p.x, p.y);
+    if (p.y > height / 2) p.y = -height / 2;
+  }
+}
+
+// =====================================================
+// CODE 8: Harmonic Mandala (FASTER)
+// =====================================================
+function drawMandala3() {
+  resetMatrix();
+  noStroke();
+  fill(0, 20);
+  rect(-width/2, -height/2, width, height);
+
+  t8 += PI / 15; // Faster step rotation
+  let scaleF = min(width, height) / 400;
+
+  stroke(0, 0, 100, 60);
+  strokeWeight(1.2);
+
+  for (let i = 1e4; i--;) {
+    let x = i % 200;
+    let y = i / 55;
+    let k = 9 * cos(x / 8);
+    let e = y / 8 - 12.5;
+    let d = (k * k + e * e) / 99 + sin(t8) / 6 + 0.5;
+    let q = 99 - (e * sin(atan2(k, e) * 7)) / d + k * (3 + cos(d * d - t8) * 2);
+    let c = d / 2 + e / 69 - t8 / 16;
+
+    let px = (q * sin(c)) * scaleF;
+    let py = (q + 19 * d - 180) * cos(c) * scaleF;
+
+    point(px, py);
+  }
+}
+
+// =====================================================
+// CODE 9: Triangle Deformed Grid (FASTER)
+// =====================================================
+function getDeformedPos(x, y, scaleF) {
+  let k = (width/2) * noise(t9) - x;
+  let e = (height/2) * noise(t9, 9) - y;
+  let d = -exp(-mag(k, e) / (1 + 45 * noise(x / 30, y / 30)) + 0.5);
+  return [ (x + k * d) * scaleF, (y + e * d) * scaleF ];
+}
+
+function drawDeformedGrid() {
+  resetMatrix();
+  background(0);
+  noFill();
+  stroke(0, 0, 100, 40);
+  strokeWeight(1);
+
+  t9 += 0.05; // 3x faster deformation step
+  let step = 12;
+  let scaleF = min(width, height) / 300;
+
+  for (let y = -100; y < 100; y += step) {
+    for (let x = -100; x < 100; x += step) {
+      let p1 = getDeformedPos(x, y, scaleF);
+      let p2 = getDeformedPos(x, y + step, scaleF);
+      let p3 = getDeformedPos(x + step, y, scaleF);
+
+      triangle(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1]);
+    }
+  }
+}
+
+// =====================================================
+// INTERACTIVE PARTICLE SIGNATURE (FASTER RESPONSE)
+// =====================================================
+function drawInteractiveSignature() {
+  resetMatrix();
+
+  let mx = mouseX - width / 2;
+  let my = mouseY - height / 2;
+
+  for (let i = 0; i < textParticles.length; i++) {
+    let p = textParticles[i];
+
+    let dx = mx - p.x;
+    let dy = my - p.y;
+    let dist = sqrt(dx * dx + dy * dy);
+
+    let maxDist = 90;
+    if (dist < maxDist && dist > 0) {
+      let force = (maxDist - dist) / maxDist;
+      let angle = atan2(dy, dx);
+      p.vx -= cos(angle) * force * 8; // Faster repulsion force
+      p.vy -= sin(angle) * force * 8;
+    }
+
+    let homeDx = p.baseX - p.x;
+    let homeDy = p.baseY - p.y;
+    p.vx += homeDx * 0.16; // Snappier spring return force
+    p.vy += homeDy * 0.16;
+
+    p.vx *= 0.78;
+    p.vy *= 0.78;
+
+    p.x += p.vx;
+    p.y += p.vy;
+
+    stroke(0, 0, 100, 90);
+    strokeWeight(2.2);
+    point(p.x, p.y);
+  }
+}
+
+// =====================================================
+// INPUT HANDLERS
+// =====================================================
+function switchArt() {
+  mode = (mode + 1) % TOTAL_MODES;
+  background(0);
+  
+  pts1 = []; t1 = 0;
+  t2 = 0; z3 = 0; f4 = 0;
+  t5 = 1; t6 = 0;
+  pts7 = []; t7 = 0;
+  t8 = 0; t9 = 0;
+
+  updateHint();
+}
+
+function mousePressed() {
+  switchArt();
+}
+
+function touchStarted() {
+  switchArt();
+  return false;
+}
+</script>
+</body>
+</html>
